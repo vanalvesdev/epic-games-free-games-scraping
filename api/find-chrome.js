@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 // directory path
-const dir = './node_modules/puppeteer/.local-chromium/linux-884014';
+const dir = './node_modules/puppeteer';
 
 module.exports = async (req, res) => {
     // list all files in the directory
