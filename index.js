@@ -3,10 +3,12 @@ let puppeteer;
 let chrome = {};
 
 if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+    console.log("RUNNING ON CLOUD")
     // running on the Vercel platform
     chrome = require('chrome-aws-lambda');
     puppeteer = require('puppeteer-core');
 } else {
+    console.log("RUNNING LOCALLY")
     // running locally
     puppeteer = require('puppeteer');
 }
