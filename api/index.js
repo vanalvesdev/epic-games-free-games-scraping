@@ -10,7 +10,7 @@ if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
     puppeteer = require('puppeteer');
 }
 
-(async () => {
+async function crawler() {
 
     console.log("starting scrape");
 
@@ -63,8 +63,8 @@ if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
     await browser.close();
 
     return data;
-})();
+}
 
 module.exports = async (req, res) => {
-    res.send(JSON.stringify(await crawler()));
+    res.json(await crawler());
 }
