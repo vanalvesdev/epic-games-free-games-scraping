@@ -1,3 +1,4 @@
+const http = require('http');
 let puppeteer;
 let chrome = {};
 
@@ -22,7 +23,7 @@ async function crawler() {
             args: [...chrome.args, '--hide-scrollbars', '--disable-web-security']   
         } : 
         {
-            headless: false,
+            headless: true
         }
 
     const browser = await puppeteer.launch(options);
@@ -65,6 +66,7 @@ async function crawler() {
     return data;
 }
 
-module.exports = async (req, res) => {
-    res.json(await crawler());
-}
+http.createServer(async (req, res) => {
+    res.writeHead(200, {"Content-Type": "application/json"})
+    res.end(JSON.stringify(await crawler()));
+}).listen(process.env.PORT || 8080)
