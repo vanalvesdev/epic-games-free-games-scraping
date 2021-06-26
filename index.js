@@ -1,34 +1,18 @@
 const http = require('http');
-let puppeteer;
-let chrome = {};
-
-if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
-    console.log("RUNNING ON CLOUD")
-    // running on the Vercel platform
-    chrome = require('chrome-aws-lambda');
-    puppeteer = require('puppeteer-core');
-} else {
-    console.log("RUNNING LOCALLY")
-    // running locally
-    puppeteer = require('puppeteer');
-}
+const puppeteer = require('puppeteer');
 
 async function crawler() {
 
     console.log("starting scrape");
+    const browserFetcher = puppeteer.createBrowserFetcher();
+    const revisionInfo = await browserFetcher.download("884014");
 
-    const options = process.env.AWS_LAMBDA_FUNCTION_VERSION ? 
-        {
-            headless: true,
-            executablePath: await chrome.executablePath,
-            defaultViewport: chrome.defaultViewport,
-            args: [...chrome.args, '--hide-scrollbars', '--disable-web-security']   
-        } : 
-        {
-            headless: true
-        }
+    console.log(`downloaded chrome in ${revisionInfo.executablePath}`);
 
-    const browser = await puppeteer.launch(options);
+    const browser = await puppeteer.launch({
+        headless: true,
+        executablePath: revisionInfo.executablePath
+    });
     const page = await browser.newPage();
 
     await page.goto('https://www.epicgames.com/store/en-US/');
@@ -45,20 +29,8 @@ async function crawler() {
                 freegames.push(game[1]);   
             }            
         });
-
-        // const section = frame.querySelector("section");
-        // const freeGamesDiv = section.querySelectorAll("[data-component='CardGridDesktopBase']");
         return freegames;
     })
-
-    // await page.screenshot({path: '1.png'});
-
-    // await page.evaluate(() => {
-    //     console.log(document.title);
-    //     const test = document.querySelector("#egLogo");
-    //     console.log("test");
-    //     return test;
-    // }).then().catch(err => console.log(err));
     console.log("############################################")
     console.log(data);
     console.log("############################################")
@@ -70,5 +42,6 @@ async function crawler() {
 
 http.createServer(async (req, res) => {
     res.writeHead(200, {"Content-Type": "application/json"})
-    res.end(JSON.stringify(await crawler()));
+    const data = await crawler();
+    res.end(JSON.stringify(data));
 }).listen(process.env.PORT || 8080)
