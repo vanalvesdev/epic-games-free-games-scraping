@@ -45,5 +45,5 @@ const crawler = async () => {
 };
 
 module.exports = async (req, res) => {
-    return await crawler();
+    res.send(JSON.stringify(await crawler()));
 }
