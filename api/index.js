@@ -1,13 +1,31 @@
-const puppeteer = require('puppeteer');
+let puppeteer;
+let chrome = {};
+
+if (process.env.AWS_LAMBDA_FUNCTION_VERSION) {
+    // running on the Vercel platform
+    chrome = require('chrome-aws-lambda');
+    puppeteer = require('puppeteer-core');
+} else {
+    // running locally
+    puppeteer = require('puppeteer');
+}
 
 (async () => {
 
     console.log("starting scrape");
 
-    const browser = await puppeteer.launch({
-         headless: true,
-         executablePath: "/vercel/path1/node_modules/puppeteer/.local-chromium/linux-884014/chrome.exe"
-        });
+    const options = process.env.AWS_LAMBDA_FUNCTION_VERSION ? 
+        {
+            headless: true,
+            executablePath: await chrome.executablePath,
+            defaultViewport: chrome.defaultViewport,
+            args: [...chrome.args, '--hide-scrollbars', '--disable-web-security']   
+        } : 
+        {
+            headless: false,
+        }
+
+    const browser = await puppeteer.launch(options);
     const page = await browser.newPage();
 
     await page.goto('https://www.epicgames.com/store/en-US/');
