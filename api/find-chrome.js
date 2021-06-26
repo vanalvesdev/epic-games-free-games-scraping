@@ -9,11 +9,6 @@ module.exports = async (req, res) => {
         if (err) {
             throw err;
         }
-
-        // files object contains all files names
-        // log them on console
-        files.forEach(file => {
-            console.log(file);
-        });
+        res.send(JSON.stringify(files))
     });
 }
