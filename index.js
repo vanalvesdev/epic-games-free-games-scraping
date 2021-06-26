@@ -11,7 +11,8 @@ async function crawler() {
 
     const browser = await puppeteer.launch({
         headless: true,
-        executablePath: revisionInfo.executablePath
+        executablePath: revisionInfo.executablePath,
+        args: ['--no-sandbox']
     });
     const page = await browser.newPage();
 
